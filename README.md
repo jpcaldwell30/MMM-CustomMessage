@@ -29,7 +29,6 @@ A bluetooth/wireless keyboard for text entry. (Wired will work but that's not as
     module: "MMM-CustomMessage",
     position: "middle_center",
     config: {
-
         myHeader: "Things to do!",
     }
 },
