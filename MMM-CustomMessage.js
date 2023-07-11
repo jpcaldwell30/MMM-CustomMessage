@@ -11,6 +11,18 @@ Module.register("MMM-CustomMessage", {
             maxWidth: "100%",
             updateInterval: 30 * 60 * 1000,     // updates display
         },
+        text: {
+			"value": ""
+        },
+        fontSize: {
+            "value": ""
+        },
+		filePath: {
+			"value": ""
+		},
+		fileContent: {
+			"value": ""
+		},
 
     start: function() {
         var self = this;
@@ -25,6 +37,21 @@ Module.register("MMM-CustomMessage", {
     getDom: function() {
       var wrapper = document.createElement("div");
 
+      var getText = () => {
+        var txt = this.config.text["value"];
+        return txt;
+    };
+
+    var getFilePath = () => {
+        var filePath = this.config.filePath["value"];
+        return filePath;
+    };
+
+    var getFontSize = () => {
+        var fontSize = this.config.fontSize["value"];
+        return fontSize;
+    };
+
     if (this.config.myHeader != ""){
       var customHeader = document.createElement("div");
       customHeader.classList.add("medium", "bright", "customHeader");
@@ -36,9 +63,44 @@ Module.register("MMM-CustomMessage", {
     moduleBody.classList.add("medium", "bright", "text");
     // Read the saved file and insert text here    (directly below this text) if possible !!!!!
     moduleBody.innerHTML = `<div contenteditable="true"></div>`;
-    wrapper.appendChild(moduleBody);
+    moduleBody.innerHTML = getText();
+    moduleBody.style.fontFamily = getFont();
+    moduleBody.style.fontSize = getFontSize();
+    moduleBody.style.fontStyle = getFontStyle();
+    moduleBody.style.color = getColor();
+        
+        //Read file content if path has been given
+        if (getFilePath() !== "") {			
+            var self = this;
+            this.readFileContent(function (response) {
+                self.config.fileContent["value"] = response.replace(/(?:\r\n|\r|\n)/g, '<br>');
+                moduleBody.innerHTML = self.config.fileContent["value"];
+            });
+        }
 
-       return wrapper;
+        wrapper.appendChild(moduleBody);
+        return wrapper;
+    },
+
+    refresh: function() {
+        this.updateDom();
+        setTimeout( () => {
+            this.refresh();
+        }, this.config.refreshMs["value"]);
+    },
+
+    //Read content from local file
+    readFileContent: function (callback) {
+        var xobj = new XMLHttpRequest(),
+            path = this.file(this.config.filePath["value"]);
+        xobj.overrideMimeType("application/text");
+        xobj.open("GET", path, true);
+        xobj.onreadystatechange = function () {
+            if (xobj.readyState === 4 && xobj.status === 200) {
+                callback(xobj.responseText);
+            }
+        };
+        xobj.send(null);
     },
 
     notificationReceived: function(notification, payload) {
@@ -46,6 +108,10 @@ Module.register("MMM-CustomMessage", {
             this.hide(500);
         }  else if (notification === 'SHOW_TODO') {
             this.show(1000);
+        }        
+    
+        if (notification == "DOM_OBJECTS_CREATED") {
+            this.refresh();
         }
 
     },
