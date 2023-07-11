@@ -1,16 +1,8 @@
-## MMM-ToDoLive
+## MMM-CustomMessage
 
 ToDo list, reminders, leaves messages, insults, etc., with a unique twist.
 
 You can update the mirror display in real time (Live), as it's running, without quitting or reloading MM.
-
-## Video example
-
-https://www.youtube.com/watch?v=kNq-WUlPFo0&feature=youtu.be
-
-## Options
-
-* 6 css files provided for different fonts, coloring and sizing.
 
 * You can use multiple instances by simply adding another config entry.
 
@@ -18,11 +10,7 @@ https://www.youtube.com/watch?v=kNq-WUlPFo0&feature=youtu.be
 
 * Works well in all regions. Make it as wide or as tall as you like it.
 
-* Will be added to Hello-Lucy as a default module.
-
 * Caveat: Multiple instances can not use different css files (unless I can figure that out).
-
-* Caveat #2: Entries will not survive a restart. I'm working on that! Sheeeesh! :-)
 
 ## Requirements and recommendations
 
@@ -38,19 +26,18 @@ A bluetooth/wireless keyboard for text entry. (Wired will work but that's not as
 ```
 {
     disabled: false,
-    module: "MMM-ToDoLive",
+    module: "MMM-CustomMessage",
     position: "middle_center",
     config: {
-        css: "4", // 1=default, 2=Clean, 3=Lord of the Rings, 4=handwriting, 5=Julee, 6=Englebert
+
         myHeader: "Things to do!",
     }
 },
 {
     disabled: false,
-    module: "MMM-ToDoLive",
+    module: "MMM-CustomMessage",
     position: "top_right",
     config: {
-        css: "4", // 1=default, 2=Clean, 3=Lord of the Rings, 4=handwriting, 5=Julee, 6=Englebert
         myHeader: "Shopping List",
     }
 },
@@ -63,7 +50,3 @@ A bluetooth/wireless keyboard for text entry. (Wired will work but that's not as
 * When you are done, click anywhere outside the text area of the module.
 * When you want to edit again, click the text of the module to enter edit mode.
 * Simply make multiple entries in your config for multiple instances
-
-## Create your own css file(s) for your favorite font(s)?
-
-* I will happily add them to the repo.
