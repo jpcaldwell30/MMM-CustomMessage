@@ -7,10 +7,15 @@
 Module.register("MMM-CustomMessage", {
 
     defaults: {
-        myHeader: "",
-            maxWidth: "100%",
-            updateInterval: 30 * 60 * 1000,     // updates display
+        headerText: {
+            "value":""
         },
+        maxWidth: {
+            "value":"100%"
+        },
+        updateInterval: {
+            "value":30 * 60 * 1000
+        },                
         text: {
 			"value": ""
         },
@@ -23,6 +28,7 @@ Module.register("MMM-CustomMessage", {
 		fileContent: {
 			"value": ""
 		},
+    },
 
     start: function() {
         var self = this;
@@ -52,10 +58,10 @@ Module.register("MMM-CustomMessage", {
         return fontSize;
     };
 
-    if (this.config.myHeader != ""){
+    if (this.config.headerText["value"] != ""){
       var customHeader = document.createElement("div");
       customHeader.classList.add("medium", "bright", "customHeader");
-      customHeader.innerHTML = this.config.myHeader;
+      customHeader.innerHTML = this.config.headerText["value"];
       wrapper.appendChild(customHeader);
     }
 
@@ -64,10 +70,7 @@ Module.register("MMM-CustomMessage", {
     // Read the saved file and insert text here    (directly below this text) if possible !!!!!
     moduleBody.innerHTML = `<div contenteditable="true"></div>`;
     moduleBody.innerHTML = getText();
-    moduleBody.style.fontFamily = getFont();
     moduleBody.style.fontSize = getFontSize();
-    moduleBody.style.fontStyle = getFontStyle();
-    moduleBody.style.color = getColor();
         
         //Read file content if path has been given
         if (getFilePath() !== "") {			
@@ -86,7 +89,7 @@ Module.register("MMM-CustomMessage", {
         this.updateDom();
         setTimeout( () => {
             this.refresh();
-        }, this.config.refreshMs["value"]);
+        }, this.config.updateInterval["value"]);
     },
 
     //Read content from local file
