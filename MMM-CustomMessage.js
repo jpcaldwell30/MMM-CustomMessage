@@ -4,34 +4,47 @@
  * By jpcaldwell30
  * MIT Licensed.
  */
+var customHeader;
+var moduleBody;
 Module.register("MMM-CustomMessage", {
 
     defaults: {
-        headerText: {
+        initialHeaderText: {
             "value":""
+        },
+        initialText: {
+			"value": ""
+        },
+        webhookHeaderText: {
+            "value": ""
+        },
+        webhookText: {
+            "value": ""
         },
         maxWidth: {
             "value":"100%"
         },
         updateInterval: {
             "value":30 * 60 * 1000
-        },                
-        text: {
-			"value": ""
         },
         fontSize: {
             "value": ""
         },
-		filePath: {
+        headerFontSize: {
+            "value": ""
+        },
+        filePath: {
 			"value": ""
 		},
-		fileContent: {
+        fileContent: {
 			"value": ""
 		},
-    },
 
+        //TODO handle header text size
+    },
     start: function() {
-        var self = this;
+        console.log('[' + this.name + '] Starting');
+        this.sendSocketNotification('START', this.config);
     },
 
     // Gets correct css file from config.js
@@ -44,44 +57,53 @@ Module.register("MMM-CustomMessage", {
       var wrapper = document.createElement("div");
 
       var getText = () => {
-        var txt = this.config.text["value"];
-        return txt;
-    };
+            var txt = this.config.initialText["value"];
+            return txt;
+        };
 
-    var getFilePath = () => {
-        var filePath = this.config.filePath["value"];
-        return filePath;
-    };
+        var getHeaderText = () => {
+            var txt = this.config.initialHeaderText["value"];
+            return txt;
+        };
 
-    var getFontSize = () => {
-        var fontSize = this.config.fontSize["value"];
-        return fontSize;
-    };
+        var getFontSize = () => {
+            var fontSize = this.config.fontSize["value"];
+            return fontSize;
+        };
 
-    if (this.config.headerText["value"] != ""){
-      var customHeader = document.createElement("div");
-      customHeader.classList.add("medium", "bright", "customHeader");
-      customHeader.innerHTML = this.config.headerText["value"];
-      wrapper.appendChild(customHeader);
-    }
+        var getHeaderFontSize = () => {
+            var fontSize = this.config.headerFontSize["value"];
+            return fontSize;
+        };
 
-    var moduleBody = document.createElement("div");
-    moduleBody.classList.add("medium", "bright", "text");
-    // Read the saved file and insert text here    (directly below this text) if possible !!!!!
-    moduleBody.innerHTML = `<div contenteditable="true"></div>`;
-    moduleBody.innerHTML = getText();
-    moduleBody.style.fontSize = getFontSize();
+        var getFilePath = () => {
+            var filePath = this.config.filePath["value"];
+            return filePath;
+        };
+
+        initialHeaderText = getHeaderText();
+        customHeader = document.createElement("div");
+        customHeader.classList.add("module-content", "customHeader");
+        customHeader.innerHTML = initialHeaderText;   
+        customHeader.style.fontSize = getHeaderFontSize;
+        wrapper.appendChild(customHeader);
         
-        //Read file content if path has been given
-        if (getFilePath() !== "") {			
-            var self = this;
-            this.readFileContent(function (response) {
-                self.config.fileContent["value"] = response.replace(/(?:\r\n|\r|\n)/g, '<br>');
-                moduleBody.innerHTML = self.config.fileContent["value"];
-            });
-        }
-
+        initialText = getText();
+        moduleBody = document.createElement("div");
+        moduleBody.classList.add("module-content");
+        // Read the saved file and insert text here    (directly below this text) if possible !!!!!
+        moduleBody.innerHTML = initialText;
+        moduleBody.style.fontSize = getFontSize();
+        moduleBody.contentEditable = "true"
         wrapper.appendChild(moduleBody);
+
+        
+        if (getFilePath() !== "") {			
+			this.readFileContent(function (response) {
+				this.config.fileContent["value"] = response.replace(/(?:\r\n|\r|\n)/g, '<br>');
+				moduleBody.innerHTML = this.config.fileContent["value"];
+			});
+		}
         return wrapper;
     },
 
@@ -93,29 +115,35 @@ Module.register("MMM-CustomMessage", {
     },
 
     //Read content from local file
-    readFileContent: function (callback) {
-        var xobj = new XMLHttpRequest(),
-            path = this.file(this.config.filePath["value"]);
-        xobj.overrideMimeType("application/text");
-        xobj.open("GET", path, true);
-        xobj.onreadystatechange = function () {
-            if (xobj.readyState === 4 && xobj.status === 200) {
-                callback(xobj.responseText);
+	readFileContent: function (callback) {
+		var xobj = new XMLHttpRequest(),
+			path = this.file(this.config.filePath["value"]);
+		xobj.overrideMimeType("application/text");
+		xobj.open("GET", path, true);
+		xobj.onreadystatechange = function () {
+			if (xobj.readyState === 4 && xobj.status === 200) {
+				callback(xobj.responseText);
+			}
+		};
+		xobj.send(null);
+	},
+
+    socketNotificationReceived: function (notification, payload) {
+        console.log(this.name + " received a new message: " + payload);
+        if (notification == "NEW_MESSAGE_RECEIVED") {
+            if (payload.message)
+            {
+                moduleBody.innerHTML = payload.message;
             }
-        };
-        xobj.send(null);
-    },
-
-    notificationReceived: function(notification, payload) {
-        if (notification === 'HIDE_TODO') {
-            this.hide(500);
-        }  else if (notification === 'SHOW_TODO') {
-            this.show(1000);
-        }        
-    
-        if (notification == "DOM_OBJECTS_CREATED") {
-            this.refresh();
+            if (payload.messageHeader)
+            {
+                customHeader.innerHTML = payload.messageHeader;
+            }
+            console.log(this.name + "applying message:" + payload.message);
+            if(payload.messageHeader)
+            {
+                console.log(this.name + "applying message:" + payload.messageHeader);
+            }
         }
-
     },
 });
