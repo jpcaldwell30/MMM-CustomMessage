@@ -15,36 +15,29 @@ Module.register("MMM-CustomMessage", {
         initialText: {
 			"value": ""
         },
-        webhookHeaderText: {
-            "value": ""
-        },
-        webhookText: {
-            "value": ""
-        },
-        maxWidth: {
-            "value":"100%"
-        },
-        updateInterval: {
-            "value":30 * 60 * 1000
-        },
         fontSize: {
             "value": ""
         },
         headerFontSize: {
             "value": ""
         },
-        filePath: {
-			"value": ""
+        enableHistory: {
+			"value": "false"
 		},
-        fileContent: {
-			"value": ""
-		},
-
-        //TODO handle header text size
+        resetMessage: {
+            "enabled": "false",
+            "time": "00:00" //24 hour time
+        },     
     },
     start: function() {
-        console.log('[' + this.name + '] Starting');
-        this.sendSocketNotification('START', this.config);
+        console.log('[' + this.name + '] Initial Start');
+        this.sendResetConfig();
+    },
+
+    sendResetConfig: function() {
+        let resetConfig = this.config.resetMessage;
+        console.log(this.name + "Sending reset message enabled with config: " + JSON.stringify(resetConfig));
+        this.sendSocketNotification('RESET_MESSAGE_CONFIG', resetConfig);
     },
 
     // Gets correct css file from config.js
@@ -56,7 +49,7 @@ Module.register("MMM-CustomMessage", {
     getDom: function() {
       var wrapper = document.createElement("div");
 
-      var getText = () => {
+        var getText = () => {
             var txt = this.config.initialText["value"];
             return txt;
         };
@@ -76,49 +69,49 @@ Module.register("MMM-CustomMessage", {
             return fontSize;
         };
 
-        var getFilePath = () => {
-            var filePath = this.config.filePath["value"];
-            return filePath;
-        };
-
         initialHeaderText = getHeaderText();
+        initialText = getText();
+
         customHeader = document.createElement("div");
         customHeader.classList.add("module-content", "customHeader");
         customHeader.innerHTML = initialHeaderText;   
         customHeader.style.fontSize = getHeaderFontSize;
-        wrapper.appendChild(customHeader);
-        
-        initialText = getText();
+
         moduleBody = document.createElement("div");
         moduleBody.classList.add("module-content");
-        // Read the saved file and insert text here    (directly below this text) if possible !!!!!
         moduleBody.innerHTML = initialText;
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
-        wrapper.appendChild(moduleBody);
 
-        
-        if (getFilePath() !== "") {			
+        if (this.config.enableHistory["value"] == "true") {			
 			this.readFileContent(function (response) {
-				this.config.fileContent["value"] = response.replace(/(?:\r\n|\r|\n)/g, '<br>');
-				moduleBody.innerHTML = this.config.fileContent["value"];
+                console.log(this.name + " read from file: " + response);
+                if (response != ""){
+                    let jsonResponse = JSON.parse(response);
+                    if (jsonResponse.message){
+                        moduleBody.innerHTML = jsonResponse.message
+                    }
+                    if (jsonResponse.messageHeader){
+                        customHeader.innerHTML = jsonResponse.messageHeader
+                    }
+                    if (jsonResponse.message == "/clear"){
+                        moduleBody.innerHTML = "";
+                        customHeader.innerHTML = "";
+                    }
+                }
 			});
 		}
-        return wrapper;
-    },
 
-    refresh: function() {
-        this.updateDom();
-        setTimeout( () => {
-            this.refresh();
-        }, this.config.updateInterval["value"]);
+        wrapper.appendChild(customHeader);
+        wrapper.appendChild(moduleBody);
+        return wrapper;
     },
 
     //Read content from local file
 	readFileContent: function (callback) {
 		var xobj = new XMLHttpRequest(),
-			path = this.file(this.config.filePath["value"]);
-		xobj.overrideMimeType("application/text");
+			path = this.file('message-history.json');
+		xobj.overrideMimeType("application/json");
 		xobj.open("GET", path, true);
 		xobj.onreadystatechange = function () {
 			if (xobj.readyState === 4 && xobj.status === 200) {
@@ -129,20 +122,25 @@ Module.register("MMM-CustomMessage", {
 	},
 
     socketNotificationReceived: function (notification, payload) {
-        console.log(this.name + " received a new message: " + payload);
+        console.log(this.name + " received a new message: " + JSON.stringify(payload));
+        if (notification == "RESET_NOW") {
+            moduleBody.innerHTML = "";
+            customHeader.innerHTML = "";
+        }
         if (notification == "NEW_MESSAGE_RECEIVED") {
             if (payload.message)
             {
+                console.log(this.name + " applying message: " + payload.message);
                 moduleBody.innerHTML = payload.message;
             }
             if (payload.messageHeader)
             {
                 customHeader.innerHTML = payload.messageHeader;
+                console.log(this.name + " applying message: " + payload.messageHeader);
             }
-            console.log(this.name + "applying message:" + payload.message);
-            if(payload.messageHeader)
-            {
-                console.log(this.name + "applying message:" + payload.messageHeader);
+            if (payload.message == "/clear"){
+                moduleBody.innerHTML = "";
+                customHeader.innerHTML = "";
             }
         }
     },
