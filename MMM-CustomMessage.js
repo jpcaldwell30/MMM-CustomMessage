@@ -141,6 +141,10 @@ Module.register("MMM-CustomMessage", {
             if (payload.message == "/clear"){
                 moduleBody.innerHTML = "";
                 customHeader.innerHTML = "";
+            }            
+	    if (payload.message == "\\clear"){
+                moduleBody.innerHTML = "";
+                customHeader.innerHTML = "";
             }
         }
     },
