@@ -1,26 +1,30 @@
 ## MMM-CustomMessage
 
-ToDo list, reminders, leaves messages, insults, etc., with a unique twist.
+This module allows you to post a message to MagicMirror either by Magic Mirror API post or manual update (entering text onscreen). 
 
-You can update the mirror display in real time (Live), as it's running, without quitting or reloading MM.
+Features:
+
+* You can update the mirror display in real time (Live), as it's running, without quitting or reloading MM.
 
 * You can use multiple instances by simply adding another config entry.
 
 * Each instance can have its own heading. Headers are self-centering.
 
-* Works well in all regions. Make it as wide or as tall as you like it.
+* The module has an API allowing for messages to be set remotely with a POST request. For example, you could use the API combined with Microsoft Power Automate to set a message on the screen whenever a message is sent to a specific teams channel. 
 
-* Caveat: Multiple instances can not use different css files (unless I can figure that out).
+* The module has a reset function that can allow for the message to be cleared automatically at a specified time daily.
+
+* The module has a history option to allow the last sent message to survive brower reloads/systems restarts.'
+
+* You can specify custom CSS by editing the MMM-CustomMessage.css file in this modules css folder
 
 ## Requirements and recommendations
 
-You will need a keyboard for text entry and a mouse to click the module into edit mode.
-
-A bluetooth/wireless keyboard for text entry. (Wired will work but that's not as cool)
+You will need a keyboard for text entry and a mouse to click the module into edit mode for manual updating.
 
 ## Installation
 
-* `git clone https://github.com/mykle1/MMM-ToDoLive` into the `~/MagicMirror/modules` directory.
+* `git clone https://github.com/jpcaldwell30/MMM-CustomMessage` into the `~/MagicMirror/modules` directory.
 
 ## Config.js entry and options
 ```
@@ -29,23 +33,50 @@ A bluetooth/wireless keyboard for text entry. (Wired will work but that's not as
     module: "MMM-CustomMessage",
     position: "middle_center",
     config: {
-        myHeader: "Things to do!",
+        initialHeaderText: "Simple Config",
     }
 },
 {
     disabled: false,
     module: "MMM-CustomMessage",
-    position: "top_right",
+    position: "middle_center",
     config: {
-        myHeader: "Shopping List",
+        initialHeaderText: {
+            "value":"Full config" // Initial header text value
+        },
+        initialText: {
+			"value": "This config contains all available settings" // Initial text value
+        },
+        fontSize: {
+            "value": "16" // Font size value. Raw value no units
+        },
+        headerFontSize: {
+            "value": "30" // Header font size value. Raw value no units
+        },
+        enableHistory: {
+			"value": "false" // Enable history. If set to true, the last message set via API will be saved to file.
+                             // Currently does not save manually set messages 
+		},
+        resetMessage: {
+            "enabled": "false", // Reset message enabled value
+            "time": "00:00" // time in 24 hour format when you want to have the message reset on a daily basis.
+        }     
     }
 },
 ```
-## How to use it!
+## How to use manual entry.
 
 * Click the default text to enter edit mode.
 * Delete default text and create your items.
 * "Enter" creates a new line.
 * When you are done, click anywhere outside the text area of the module.
 * When you want to edit again, click the text of the module to enter edit mode.
-* Simply make multiple entries in your config for multiple instances
+
+## How to use API.
+The API uses MagicMirror's ExpressApp backend. The default endpoint is http:\\<your MagicMirror url or ip and port> + /custom-message For example: http:\\localhost:8080\custom-message The endpoint accepts POST requests with a JSON body of the form:
+
+{
+  "messageHeader": "Message Header Message",
+  "message": "Message Text"
+}
+

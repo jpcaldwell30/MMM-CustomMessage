@@ -1,169 +1,112 @@
+/* Magic Mirror
+ * Module: MMM-CustomMessage
+ *
+ * By jpcaldwell30
+ * MIT Licensed.
+ */
+// Import required modules
 const NodeHelper = require('node_helper');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 
+// Export the module
 module.exports = NodeHelper.create({
+    // Function called when the module starts
     start: function () {
-        this.resetConfig = {};
-        console.log(this.name + ' helper started');
-        this.handleApiRequest();    
+        this.resetConfig = {}; // Initialize reset configuration
+        console.log(this.name + ' helper started'); // Log that the helper has started
+        this.handleApiRequest(); // Handle API requests   
     },
 
+    // Function to write to the history file
     writeHistoryFile: function (text) {
-        const fileName = "modules/MMM-CustomMessage/message-history.json";
-        fs.writeFile(fileName, text, (err) => {
-            console.log(this.name + " Writing to file", text);
-            if (err) {
-                console.log(this.name + "Error writing to history file:", err);
+        const fileName = "modules/MMM-CustomMessage/message-history.json"; // Define the file name
+        fs.writeFile(fileName, text, (err) => { // Write to the file
+            console.log(this.name + " Writing to file", text); // Log the writing process
+            if (err) { // If there's an error
+                console.log(this.name + "Error writing to history file:", err); // Log the error
             } else {
-                res.send("Config file written successfully.");
+                res.send("Config file written successfully."); // Send a success message
             }
         });     
     },
 
+    // Function to reset the module
     reset: function () {
-        if (this.resetConfig["enabled"] == "true") {
-            const now = new Date();
-            const targetTime = new Date(now);
-            const time = this.resetConfig["time"].split(":");
-            const targetHour =  Number(time[0])
-            const targetMinute = Number(time[1])
-            console.log(this.name + 'Reset set for Hour: ', targetHour, ', Min: ', targetMinute);
-            targetTime.setHours(targetHour, targetMinute, 0, 0);
+        if (this.resetConfig["enabled"] == "true") { // If reset is enabled
+            const now = new Date(); // Get the current date and time
+            const targetTime = new Date(now); // Set the target time to now
+            const time = this.resetConfig["time"].split(":"); // Split the reset time into hours and minutes
+            const targetHour =  Number(time[0]) // Get the target hour
+            const targetMinute = Number(time[1]) // Get the target minute
+            console.log(this.name + 'Reset set for Hour: ', targetHour, ', Min: ', targetMinute); // Log the reset time
+            targetTime.setHours(targetHour, targetMinute, 0, 0); // Set the target time
         
-            let timeToWait = targetTime - now;
-            //let timeToWaitInterval = 24 * 60 * 60 * 1000; 
+            let timeToWait = targetTime - now; // Calculate how long to wait before resetting
         
-            if (timeToWait < 0) {
-            // If the target hour has already passed today, move to the next day
-            targetTime.setDate(targetTime.getDate() + 1);
-            timeToWait = targetTime - now;
-            console.log(this.name + ' Target time already passed, moving to next day');
+            if (timeToWait < 0) { // If the target time has already passed today
+                targetTime.setDate(targetTime.getDate() + 1); // Move to the next day
+                timeToWait = targetTime - now; // Recalculate how long to wait
+                console.log(this.name + ' Target time already passed, moving to next day'); // Log that the target time has passed and we're moving to the next day
             }
-            console.log(this.name + ' TimeToWait: ', timeToWait);
+            console.log(this.name + ' TimeToWait: ', timeToWait); // Log how long we're waiting
 
-            setTimeout(() => {
-                console.log(this.name + ' Reset message time is now. Retting message...');
-                this.writeHistoryFile("");
-                this.sendSocketNotification('RESET_NOW');
-            // If you want to perform the action repeatedly every 24 hours, you can use setInterval instead.
-            //setInterval(() => action(), 24 * 60 * 60 * 1000);
+            setTimeout(() => { // Wait for the specified amount of time, then...
+                console.log(this.name + ' Reset message time is now. Retting message...'); 
+                this.writeHistoryFile(""); //clear history file
+                this.sendSocketNotification('RESET_NOW'); //send reset notification
             }, timeToWait);
-
-            // setInterval(() => {
-            //     this.sendSocketNotification('NEW_MESSAGE_RECEIVED', req.body);
-            // }, timeToWaitInterval);
         }   else {
-            console.log(this.name + ' Reset not enabled');
+            console.log(this.name + ' Reset not enabled'); 
         }  
     },
-
+    // Function to handle API requests
     handleApiRequest: function () {
-        this.expressApp.use(bodyParser.json()); // support json encoded bodies
-        this.expressApp.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
+        // Use bodyParser middleware to parse JSON bodies
+        this.expressApp.use(bodyParser.json()); 
+
+        // Use bodyParser middleware to parse URL-encoded bodies
+        this.expressApp.use(bodyParser.urlencoded({ extended: true })); 
+
+        // Define a POST route at '/custom-message'
         this.expressApp.post('/custom-message', (req, res) => {
+            // Convert the request body to a JSON string
             let stringBody = JSON.stringify(req.body)
+
+            // Log the incoming webhook notification
             console.log('Incoming webhook notification : ' + stringBody);
+
+            // If the request body exists
             if (req.body){
-                    this.sendSocketNotification('NEW_MESSAGE_RECEIVED', req.body);
-                    this.writeHistoryFile(stringBody)
-                    this.reset();
-                    res.send({"status": "success"});
-                }else{
-                    res.send({"status": "failed", "error": "No payload given."});
-                }
-        });
-    },
+                // Send a socket notification with the request body
+                this.sendSocketNotification('NEW_MESSAGE_RECEIVED', req.body);
 
-    socketNotificationReceived(notification, payload) {
-        if (notification === 'RESET_MESSAGE_CONFIG') {
-            console.log(this.name + ' Reset Message: ', JSON.stringify(payload));
-            this.resetConfig = payload;
-            this.reset();        
-        }
-    }
-});
-const NodeHelper = require('node_helper');
-const bodyParser = require('body-parser');
-const fs = require('fs');
+                // Write the request body to the history file
+                this.writeHistoryFile(stringBody)
 
-module.exports = NodeHelper.create({
-    start: function () {
-        this.resetConfig = {};
-        console.log(this.name + ' helper started');
-        this.handleApiRequest();    
-    },
+                // Reset messages
+                this.reset();
 
-    writeHistoryFile: function (text) {
-        const fileName = "modules/MMM-CustomMessage/message-history.json";
-        fs.writeFile(fileName, text, (err) => {
-            console.log(this.name + " Writing to file", text);
-            if (err) {
-                console.log(this.name + "Error writing to history file:", err);
+                // Send a success status
+                res.send({"status": "success"});
             } else {
-                res.send("Config file written successfully.");
+                // If no request body was provided, send a failed status with an error message
+                res.send({"status": "failed", "error": "No payload given."});
             }
-        });     
-    },
-
-    reset: function () {
-        if (this.resetConfig["enabled"] == "true") {
-            const now = new Date();
-            const targetTime = new Date(now);
-            const time = this.resetConfig["time"].split(":");
-            const targetHour =  Number(time[0])
-            const targetMinute = Number(time[1])
-            console.log(this.name + 'Reset set for Hour: ', targetHour, ', Min: ', targetMinute);
-            targetTime.setHours(targetHour, targetMinute, 0, 0);
-        
-            let timeToWait = targetTime - now;
-            //let timeToWaitInterval = 24 * 60 * 60 * 1000; 
-        
-            if (timeToWait < 0) {
-            // If the target hour has already passed today, move to the next day
-            targetTime.setDate(targetTime.getDate() + 1);
-            timeToWait = targetTime - now;
-            console.log(this.name + ' Target time already passed, moving to next day');
-            }
-            console.log(this.name + ' TimeToWait: ', timeToWait);
-
-            setTimeout(() => {
-                console.log(this.name + ' Reset message time is now. Retting message...');
-                this.writeHistoryFile("");
-                this.sendSocketNotification('RESET_NOW');
-            // If you want to perform the action repeatedly every 24 hours, you can use setInterval instead.
-            //setInterval(() => action(), 24 * 60 * 60 * 1000);
-            }, timeToWait);
-
-            // setInterval(() => {
-            //     this.sendSocketNotification('NEW_MESSAGE_RECEIVED', req.body);
-            // }, timeToWaitInterval);
-        }   else {
-            console.log(this.name + ' Reset not enabled');
-        }  
-    },
-
-    handleApiRequest: function () {
-        this.expressApp.use(bodyParser.json()); // support json encoded bodies
-        this.expressApp.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-        this.expressApp.post('/custom-message', (req, res) => {
-            let stringBody = JSON.stringify(req.body)
-            console.log('Incoming webhook notification : ' + stringBody);
-            if (req.body){
-                    this.sendSocketNotification('NEW_MESSAGE_RECEIVED', req.body);
-                    this.writeHistoryFile(stringBody)
-                    this.reset();
-                    res.send({"status": "success"});
-                }else{
-                    res.send({"status": "failed", "error": "No payload given."});
-                }
         });
     },
 
+    // Function to handle socket notifications
     socketNotificationReceived(notification, payload) {
+        // If the notification is 'RESET_MESSAGE_CONFIG'
         if (notification === 'RESET_MESSAGE_CONFIG') {
+            // Log the reset message
             console.log(this.name + ' Reset Message: ', JSON.stringify(payload));
+
+            // Update the reset configuration with the payload
             this.resetConfig = payload;
+
+            // Reset messages
             this.reset();        
         }
     }
