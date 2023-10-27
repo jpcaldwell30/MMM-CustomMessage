@@ -14,9 +14,9 @@ Features:
 
 * The module has a reset function that can allow for the message to be cleared automatically at a specified time daily.
 
-* The module has a history option to allow the last sent message to survive brower reloads/systems restarts.'
+* The module has a history option to allow the last sent message to survive browser reloads/systems restarts.
 
-* You can specify custom CSS by editing the MMM-CustomMessage.css file in this modules css folder
+* You can specify custom CSS by editing the MMM-CustomMessage.css file in this module's CSS folder
 
 ## Requirements and recommendations
 
@@ -29,54 +29,53 @@ You will need a keyboard for text entry and a mouse to click the module into edi
 ## Config.js entry and options
 ```
 {
-    disabled: false,
-    module: "MMM-CustomMessage",
-    position: "middle_center",
-    config: {
-        initialHeaderText: "Simple Config",
-    }
+    disabled: false,
+    module: "MMM-CustomMessage",
+    position: "middle_center",
+    config: {
+        initialHeaderText: "Simple Config",
+    }
 },
 {
-    disabled: false,
-    module: "MMM-CustomMessage",
-    position: "middle_center",
-    config: {
-        initialHeaderText: {
-            "value":"Full config" // Initial header text value
-        },
-        initialText: {
-			"value": "This config contains all available settings" // Initial text value
-        },
-        fontSize: {
-            "value": "16" // Font size value. Raw value no units
-        },
-        headerFontSize: {
-            "value": "30" // Header font size value. Raw value no units
-        },
-        enableHistory: {
-			"value": "false" // Enable history. If set to true, the last message set via API will be saved to file.
-                             // Currently does not save manually set messages 
-		},
-        resetMessage: {
-            "enabled": "false", // Reset message enabled value
-            "time": "00:00" // time in 24 hour format when you want to have the message reset on a daily basis.
-        }     
-    }
+    disabled: false,
+    module: "MMM-CustomMessage",
+    position: "middle_center",
+    config: {
+        initialHeaderText: {
+            "value":"Full config" // Initial header text value
+        },
+        initialText: {
+            "value": "This config contains all available settings" // Initial text value
+        },
+        fontSize: {
+            "value": "16" // Font size value. Raw value no units
+        },
+        headerFontSize: {
+            "value": "30" // Header font size value. Raw value no units
+        },
+        enableHistory: {
+            "value": "false" // Enable history. If set to true, the last message set via API will be saved to file.
+                             // Currently does not save manually set messages 
+        },
+        resetMessage: {
+            "enabled": "false", // Reset message enabled value
+            "time": "00:00" // time in 24 hour format when you want to have the message reset on a daily basis.
+        }     
+    }
 },
 ```
 ## How to use manual entry.
 
 * Click the default text to enter edit mode.
-* Delete default text and create your items.
+* Delete the default text and create your items.
 * "Enter" creates a new line.
 * When you are done, click anywhere outside the text area of the module.
 * When you want to edit again, click the text of the module to enter edit mode.
 
-## How to use API.
+## How to use the API.
 The API uses MagicMirror's ExpressApp backend. The default endpoint is http:\\<your MagicMirror url or ip and port> + /custom-message For example: http:\\localhost:8080\custom-message The endpoint accepts POST requests with a JSON body of the form:
 
 {
-  "messageHeader": "Message Header Message",
-  "message": "Message Text"
+  "messageHeader": "Message Header Message",
+  "message": "Message Text"
 }
-
