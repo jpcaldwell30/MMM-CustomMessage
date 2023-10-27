@@ -169,6 +169,10 @@ Module.register("MMM-CustomMessage", {
                 // Clear the inner HTML of the module body and custom header
                 moduleBody.innerHTML = "";
                 customHeader.innerHTML = "";
+            }            
+	    if (payload.message == "\\clear"){
+                moduleBody.innerHTML = "";
+                customHeader.innerHTML = "";
             }
         }
     },
