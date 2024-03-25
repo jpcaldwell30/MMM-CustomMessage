@@ -91,6 +91,11 @@ Module.register("MMM-CustomMessage", {
         moduleBody = document.createElement("div");
         moduleBody.classList.add("module-content", "customBody");
         moduleBody.innerHTML = initialText;
+	if (initialText === "") {
+		moduleBody.style.height = 0;
+	} else {
+		moduleBody.style.height = "unset";
+	}
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
 
