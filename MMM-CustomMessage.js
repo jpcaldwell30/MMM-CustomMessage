@@ -94,7 +94,7 @@ Module.register("MMM-CustomMessage", {
 	if (initialText === "") {
 		moduleBody.style.height = 0;
 	} else {
-		moduleBody.style.height = "unset";
+		moduleBody.style.height = "";
 	}
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
@@ -110,7 +110,7 @@ Module.register("MMM-CustomMessage", {
 			if (initialText === "") {
 				moduleBody.style.height = 0;
 			} else {
-				moduleBody.style.height = "unset";
+				moduleBody.style.height = "";
 			}
                     }
                     if (jsonResponse.messageHeader){
@@ -171,7 +171,7 @@ Module.register("MMM-CustomMessage", {
 		if (initialText === "") {
 			moduleBody.style.height = 0;
 		} else {
-			moduleBody.style.height = "unset";
+			moduleBody.style.height = "";
 		}    
             }
             // If there's a header message in the payload
