@@ -89,7 +89,7 @@ Module.register("MMM-CustomMessage", {
 
         /* Create module body div */
         moduleBody = document.createElement("div");
-        moduleBody.classList.add("module-content");
+        moduleBody.classList.add("module-content", "customBody");
         moduleBody.innerHTML = initialText;
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
