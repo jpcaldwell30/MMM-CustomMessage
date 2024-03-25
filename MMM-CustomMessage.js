@@ -106,14 +106,20 @@ Module.register("MMM-CustomMessage", {
                 if (response != ""){
                     let jsonResponse = JSON.parse(response);
                     if (jsonResponse.message){
-                        moduleBody.innerHTML = jsonResponse.message
+                        moduleBody.innerHTML = jsonResponse.message;
+			if (initialText === "") {
+				moduleBody.style.height = 0;
+			} else {
+				moduleBody.style.height = "unset";
+			}
                     }
                     if (jsonResponse.messageHeader){
-                        customHeader.innerHTML = jsonResponse.messageHeader
+                        customHeader.innerHTML = jsonResponse.messageHeader;
                     }
                     if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
                         // Clear the inner HTML of the module body and custom header
                         moduleBody.innerHTML = "";
+			moduleBody.style.height = 0;
                         customHeader.innerHTML = "";
                     }
                 }
@@ -149,6 +155,7 @@ Module.register("MMM-CustomMessage", {
         if (notification == "RESET_NOW") {
             // Clear the inner HTML of the module body and custom header
             moduleBody.innerHTML = "";
+	    moduleBody.style.height = 0;
             customHeader.innerHTML = "";
         }
 
@@ -161,6 +168,11 @@ Module.register("MMM-CustomMessage", {
                 console.log(this.name + " applying message: " + payload.message);
                 // Set the inner HTML of the module body to the message
                 moduleBody.innerHTML = payload.message;
+		if (initialText === "") {
+			moduleBody.style.height = 0;
+		} else {
+			moduleBody.style.height = "unset";
+		}    
             }
             // If there's a header message in the payload
             if (payload.messageHeader)
@@ -173,10 +185,12 @@ Module.register("MMM-CustomMessage", {
             if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
                 // Clear the inner HTML of the module body and custom header
                 moduleBody.innerHTML = "";
+		moduleBody.style.height = 0;
                 customHeader.innerHTML = "";
             }            
 	    if (payload.message == "\\clear"){
                 moduleBody.innerHTML = "";
+		moduleBody.style.height = 0;
                 customHeader.innerHTML = "";
             }
         }
