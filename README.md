@@ -1,6 +1,6 @@
 ## MMM-CustomMessage
 
-This module allows you to post a message to MagicMirror either by Magic Mirror API post or manual update (entering text onscreen). 
+This module allows you to post a message to MagicMirror either by MagicMirror² API post or manual update (entering text onscreen). 
 
 ![Example Image](example1.png)
 
