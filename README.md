@@ -2,6 +2,8 @@
 
 This module allows you to post a message to MagicMirror either by Magic Mirror API post or manual update (entering text onscreen). 
 
+![Example Image](example.png)
+
 Features:
 
 * You can update the mirror display in real time (Live), as it's running, without quitting or reloading MM.
