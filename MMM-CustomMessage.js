@@ -94,7 +94,6 @@ Module.register("MMM-CustomMessage", {
 	if (!initialText) {
 		moduleBody.style.height = 0;
 	} else {
-		//moduleBody.style.height = "";
 		moduleBody.style.removeProperty('height');
 	}
         moduleBody.style.fontSize = getFontSize();
@@ -108,12 +107,7 @@ Module.register("MMM-CustomMessage", {
                     let jsonResponse = JSON.parse(response);
                     if (jsonResponse.message){
                         moduleBody.innerHTML = jsonResponse.message;
-			if (!jsonResponse.message) {
-				moduleBody.style.height = 0;
-			} else {
-				//moduleBody.style.height = "";
-				moduleBody.style.removeProperty('height');
-			}
+			moduleBody.style.removeProperty('height');
                     }
                     if (jsonResponse.messageHeader){
                         customHeader.innerHTML = jsonResponse.messageHeader;
@@ -173,7 +167,6 @@ Module.register("MMM-CustomMessage", {
 		if (!payload.message) {
 			moduleBody.style.height = 0;
 		} else {
-			//moduleBody.style.height = "";
 			moduleBody.style.removeProperty('height');
 		}    
             }
