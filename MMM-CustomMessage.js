@@ -91,7 +91,7 @@ Module.register("MMM-CustomMessage", {
         moduleBody = document.createElement("div");
         moduleBody.classList.add("module-content", "customBody");
         moduleBody.innerHTML = initialText;
-	if (initialText === "") {
+	if (!initialText) {
 		moduleBody.style.height = 0;
 	} else {
 		//moduleBody.style.height = "";
@@ -108,7 +108,7 @@ Module.register("MMM-CustomMessage", {
                     let jsonResponse = JSON.parse(response);
                     if (jsonResponse.message){
                         moduleBody.innerHTML = jsonResponse.message;
-			if (jsonResponse.message === "") {
+			if (!jsonResponse.message) {
 				moduleBody.style.height = 0;
 			} else {
 				//moduleBody.style.height = "";
@@ -170,7 +170,7 @@ Module.register("MMM-CustomMessage", {
                 console.log(this.name + " applying message: " + payload.message);
                 // Set the inner HTML of the module body to the message
                 moduleBody.innerHTML = payload.message;
-		if (payload.message === "") {
+		if (!payload.message) {
 			moduleBody.style.height = 0;
 		} else {
 			//moduleBody.style.height = "";
