@@ -2,7 +2,7 @@
 
 This module allows you to post a message to MagicMirror either by Magic Mirror API post or manual update (entering text onscreen). 
 
-![Example Image](example.png)
+![Example Image](example1.png)
 
 Features:
 
