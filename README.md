@@ -27,7 +27,7 @@ You will need a keyboard for text entry and a mouse to click the module into edi
 * `git clone https://github.com/jpcaldwell30/MMM-CustomMessage` into the `~/MagicMirror/modules` directory.
 
 ## Config.js entry and options
-```
+```js
 {
     disabled: false,
     module: "MMM-CustomMessage",
