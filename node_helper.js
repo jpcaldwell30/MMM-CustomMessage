@@ -34,7 +34,7 @@ module.exports = NodeHelper.create({
     // Function to reset the module
     reset: function () {
         if (this.resetConfig["enabled"] == "true") { // If reset is enabled
-            const now = new Date(); // Get the current date and time
+            const now = new Date(Date.now()); // Get the current date and time
             const targetTime = new Date(now); // Set the target time to now
             const time = this.resetConfig["time"].split(":"); // Split the reset time into hours and minutes
             const targetHour =  Number(time[0]) // Get the target hour
