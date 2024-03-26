@@ -164,7 +164,7 @@ Module.register("MMM-CustomMessage", {
         // If a new message is received
         if (notification == "NEW_MESSAGE_RECEIVED") {
             // If there's a message in the payload
-            if (payload.message)
+            if (payload.message || payload.message == "")
             {
                 // Log the application of the message
                 console.log(this.name + " applying message: " + payload.message);
