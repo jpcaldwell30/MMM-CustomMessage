@@ -1,6 +1,8 @@
 ## MMM-CustomMessage
 
-This module allows you to post a message to MagicMirror either by Magic Mirror API post or manual update (entering text onscreen). 
+This module allows you to post a message to MagicMirror either by MagicMirror² API post or manual update (entering text onscreen). 
+
+![Example Image](example1.png)
 
 Features:
 
@@ -27,7 +29,7 @@ You will need a keyboard for text entry and a mouse to click the module into edi
 * `git clone https://github.com/jpcaldwell30/MMM-CustomMessage` into the `~/MagicMirror/modules` directory.
 
 ## Config.js entry and options
-```
+```js
 {
     disabled: false,
     module: "MMM-CustomMessage",

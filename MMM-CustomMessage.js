@@ -1,4 +1,4 @@
-/* Magic Mirror
+/* MagicMirror²
  * Module: MMM-CustomMessage
  *
  * By jpcaldwell30
@@ -89,8 +89,13 @@ Module.register("MMM-CustomMessage", {
 
         /* Create module body div */
         moduleBody = document.createElement("div");
-        moduleBody.classList.add("module-content");
+        moduleBody.classList.add("module-content", "customBody");
         moduleBody.innerHTML = initialText;
+	if (!initialText) {
+		moduleBody.style.height = 0;
+	} else {
+		moduleBody.style.removeProperty('height');
+	}
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
 
@@ -101,14 +106,16 @@ Module.register("MMM-CustomMessage", {
                 if (response != ""){
                     let jsonResponse = JSON.parse(response);
                     if (jsonResponse.message){
-                        moduleBody.innerHTML = jsonResponse.message
+                        moduleBody.innerHTML = jsonResponse.message;
+			moduleBody.style.removeProperty('height');
                     }
                     if (jsonResponse.messageHeader){
-                        customHeader.innerHTML = jsonResponse.messageHeader
+                        customHeader.innerHTML = jsonResponse.messageHeader;
                     }
                     if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
                         // Clear the inner HTML of the module body and custom header
                         moduleBody.innerHTML = "";
+			moduleBody.style.height = 0;
                         customHeader.innerHTML = "";
                     }
                 }
@@ -144,18 +151,24 @@ Module.register("MMM-CustomMessage", {
         if (notification == "RESET_NOW") {
             // Clear the inner HTML of the module body and custom header
             moduleBody.innerHTML = "";
+	    moduleBody.style.height = 0;
             customHeader.innerHTML = "";
         }
 
         // If a new message is received
         if (notification == "NEW_MESSAGE_RECEIVED") {
             // If there's a message in the payload
-            if (payload.message)
+            if (payload.message || payload.message == "")
             {
                 // Log the application of the message
                 console.log(this.name + " applying message: " + payload.message);
                 // Set the inner HTML of the module body to the message
                 moduleBody.innerHTML = payload.message;
+		if (!payload.message) {
+			moduleBody.style.height = 0;
+		} else {
+			moduleBody.style.removeProperty('height');
+		}    
             }
             // If there's a header message in the payload
             if (payload.messageHeader)
@@ -168,10 +181,12 @@ Module.register("MMM-CustomMessage", {
             if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
                 // Clear the inner HTML of the module body and custom header
                 moduleBody.innerHTML = "";
+		moduleBody.style.height = 0;
                 customHeader.innerHTML = "";
             }            
 	    if (payload.message == "\\clear"){
                 moduleBody.innerHTML = "";
+		moduleBody.style.height = 0;
                 customHeader.innerHTML = "";
             }
         }
