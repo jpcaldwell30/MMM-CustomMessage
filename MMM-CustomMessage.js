@@ -1,14 +1,15 @@
-/* MagicMirror²
+/* Magic Mirror2
  * Module: MMM-CustomMessage
  *
  * By jpcaldwell30
  * MIT Licensed.
  */
 // Declare variables for custom header and module body
-var customHeader;
+var moduleHeader;
 var moduleBody;
+var enabledModuleCollapse;
 
-// Register the module with the MagicMirror framework
+// Register the module with the MagicMirror frameworkF
 Module.register("MMM-CustomMessage", {
 
     // Define default module configuration
@@ -31,7 +32,10 @@ Module.register("MMM-CustomMessage", {
         resetMessage: {
             "enabled": "false", // Reset message enabled value
             "time": "00:00" // Reset message time in 24 hour format
-        },     
+        },
+        enableModuleCollapse: {
+            "enabled": "false" // Enable collapsing the hieght of 
+        }     
     },
 
     // Function called when the module starts
@@ -77,27 +81,37 @@ Module.register("MMM-CustomMessage", {
             return fontSize;
         };
 
+        var getModuleCollapse = () => {
+            var enabled = this.config.enableModuleCollapse["enabled"]; //raw font size value no units
+            return enabled;
+        };
+
         /* Get initial header text and initial text */
         initialHeaderText = getHeaderText();
         initialText = getText();
 
         /* Create custom header div */
-        customHeader = document.createElement("div");
-        customHeader.classList.add("module-content", "customHeader");
-        customHeader.innerHTML = initialHeaderText;   
-        customHeader.style.fontSize = getHeaderFontSize;
+        moduleHeader = document.createElement("div");
+        moduleHeader.classList.add("module-content", "moduleHeader");
+        moduleHeader.innerHTML = initialHeaderText;   
+        moduleHeader.style.fontSize = getHeaderFontSize();
 
         /* Create module body div */
         moduleBody = document.createElement("div");
-        moduleBody.classList.add("module-content", "customBody");
+        moduleBody.classList.add("module-content", "moduleBody");
         moduleBody.innerHTML = initialText;
-	if (!initialText) {
-		moduleBody.style.height = 0;
-	} else {
-		moduleBody.style.removeProperty('height');
-	}
         moduleBody.style.fontSize = getFontSize();
         moduleBody.contentEditable = "true"
+        
+        enabledModuleCollapse = getModuleCollapse();
+
+        if (enabledModuleCollapse == "true") {
+            if (!initialHeaderText) {
+                moduleHeader.style.height = 0;
+            } 
+        } else {
+            moduleHeader.style.removeProperty('height');
+        }
 
       /* If history is enabled, read content from local file */
         if (this.config.enableHistory["value"] == "true") {			
@@ -105,25 +119,44 @@ Module.register("MMM-CustomMessage", {
                 console.log(this.name + " read from file: " + response);
                 if (response != ""){
                     let jsonResponse = JSON.parse(response);
-                    if (jsonResponse.message){
-                        moduleBody.innerHTML = jsonResponse.message;
-			moduleBody.style.removeProperty('height');
-                    }
-                    if (jsonResponse.messageHeader){
-                        customHeader.innerHTML = jsonResponse.messageHeader;
-                    }
-                    if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
-                        // Clear the inner HTML of the module body and custom header
-                        moduleBody.innerHTML = "";
-			moduleBody.style.height = 0;
-                        customHeader.innerHTML = "";
+                    // If there's a message in the payload
+                    if (jsonResponse.messageHeader || jsonResponse.message) {
+                        if (jsonResponse.message.includes("/clear") || jsonResponse.message.includes("\\clear")){ //if you forget which type of slash to use for the command...
+                            console.log(this.name + " received clear command, clearing message...");   
+                            moduleBody.innerHTML = "";
+                            moduleHeader.innerHTML = "";
+                            if (enabledModuleCollapse == "true") {
+                                moduleHeader.style.height = 0;
+                            } else {
+                                moduleHeader.style.removeProperty('height');
+                            }
+                        } else {
+                            if (jsonResponse.messageHeader) {
+                                // Log the application of the message
+                                console.log(this.name + " applying header: " + jsonResponse.messageHeader);
+                                // Set the inner HTML of the module body to the message
+                                moduleHeader.innerHTML = jsonResponse.messageHeader;
+                                if (enabledModuleCollapse == "true") {
+                                    moduleHeader.style.removeProperty('height');
+                                }
+                            } else {
+                                if (enabledModuleCollapse == "true") {
+                                    moduleHeader.style.height = 0;
+                                }
+                            }
+                            if (jsonResponse.message) {
+                                // Log the application of the message
+                                console.log(this.name + " applying message: " + jsonResponse.message);
+                                // Set the inner HTML of the module body to the message
+                                moduleBody.innerHTML = jsonResponse.message;
+                            }
+                        }
                     }
                 }
-			});
-	    }
-
+            });
+        }
        /* Append custom header and module body to wrapper */
-       wrapper.appendChild(customHeader);
+       wrapper.appendChild(moduleHeader);
        wrapper.appendChild(moduleBody);
        return wrapper; // Return the wrapper element
    },
@@ -151,44 +184,49 @@ Module.register("MMM-CustomMessage", {
         if (notification == "RESET_NOW") {
             // Clear the inner HTML of the module body and custom header
             moduleBody.innerHTML = "";
-	    moduleBody.style.height = 0;
-            customHeader.innerHTML = "";
+            moduleHeader.innerHTML = "";
+            if (enabledModuleCollapse == "true") {
+                moduleHeader.style.height = 0;
+            } else {
+                moduleHeader.style.removeProperty('height');
+            }
         }
 
         // If a new message is received
         if (notification == "NEW_MESSAGE_RECEIVED") {
             // If there's a message in the payload
-            if (payload.message || payload.message == "")
-            {
-                // Log the application of the message
-                console.log(this.name + " applying message: " + payload.message);
-                // Set the inner HTML of the module body to the message
-                moduleBody.innerHTML = payload.message;
-		if (!payload.message) {
-			moduleBody.style.height = 0;
-		} else {
-			moduleBody.style.removeProperty('height');
-		}    
-            }
-            // If there's a header message in the payload
-            if (payload.messageHeader)
-            {
-                // Set the inner HTML of the custom header to the header message
-                customHeader.innerHTML = payload.messageHeader;
-                // Log the application of the header message
-                console.log(this.name + " applying message: " + payload.messageHeader);
-            }
-            if (payload.message == "/clear" || payload.message == "\\clear"){ //if you forget which type of slash to use for the command...
-                // Clear the inner HTML of the module body and custom header
-                moduleBody.innerHTML = "";
-		moduleBody.style.height = 0;
-                customHeader.innerHTML = "";
-            }            
-	    if (payload.message == "\\clear"){
-                moduleBody.innerHTML = "";
-		moduleBody.style.height = 0;
-                customHeader.innerHTML = "";
-            }
+            if (payload.messageHeader || payload.message) {
+                if (payload.message.includes("/clear") || payload.message.includes("\\clear")){ //if you forget which type of slash to use for the command...
+                    console.log(this.name + " received clear command, clearing message...");   
+                    moduleBody.innerHTML = "";
+                    moduleHeader.innerHTML = "";
+                    if (enabledModuleCollapse == "true") {
+                        moduleHeader.style.height = 0;
+                    } else {
+                        moduleHeader.style.removeProperty('height');
+                    }
+                } else {
+                    if (payload.messageHeader) {
+                        // Log the application of the message
+                        console.log(this.name + " applying header: " + payload.messageHeader);
+                        // Set the inner HTML of the module body to the message
+                        moduleHeader.innerHTML = payload.messageHeader;
+                        if (enabledModuleCollapse == "true") {
+                            moduleHeader.style.removeProperty('height');
+                        }
+                    } else {
+                        if (enabledModuleCollapse == "true") {
+                            moduleHeader.style.height = 0;
+                        }
+                    }
+                    if (payload.message) {
+                        // Log the application of the message
+                        console.log(this.name + " applying message: " + payload.message);
+                        // Set the inner HTML of the module body to the message
+                        moduleBody.innerHTML = payload.message;
+                    }
+                }
+            } 
         }
-    },
+    }
 });
