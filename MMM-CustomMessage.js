@@ -1,4 +1,4 @@
-/* Magic Mirror2
+/* Magic Mirror
  * Module: MMM-CustomMessage
  *
  * By jpcaldwell30
@@ -148,7 +148,8 @@ Module.register("MMM-CustomMessage", {
                                 // Log the application of the message
                                 console.log(this.name + " applying message: " + jsonResponse.message);
                                 // Set the inner HTML of the module body to the message
-                                moduleBody.innerHTML = jsonResponse.message;
+                                var cleanedMessage = payload.message.replace(/^<p>(.*?)<\/p>/, "$1 ");
+                                moduleBody.innerHTML = cleanedMessage;
                             }
                         }
                     }
@@ -223,7 +224,8 @@ Module.register("MMM-CustomMessage", {
                         // Log the application of the message
                         console.log(this.name + " applying message: " + payload.message);
                         // Set the inner HTML of the module body to the message
-                        moduleBody.innerHTML = payload.message;
+                        var cleanedMessage = payload.message.replace(/^<p>(.*?)<\/p>/, "$1 ");
+                        moduleBody.innerHTML = cleanedMessage;
                     }
                 }
             } 
