@@ -8,10 +8,6 @@ Features:
 
 * You can update the mirror display in real time (Live), as it's running, without quitting or reloading MM.
 
-* You can use multiple instances by simply adding another config entry.
-
-* Each instance can have its own heading. Headers are self-centering.
-
 * The module has an API allowing for messages to be set remotely with a POST request. For example, you could use the API combined with Microsoft Power Automate to set a message on the screen whenever a message is sent to a specific teams channel. 
 
 * The module has a reset function that can allow for the message to be cleared automatically at a specified time daily.
@@ -62,7 +58,10 @@ You will need a keyboard for text entry and a mouse to click the module into edi
         resetMessage: {
             "enabled": "false", // Reset message enabled value
             "time": "00:00" // time in 24 hour format when you want to have the message reset on a daily basis.
-        }     
+        }
+        enableModuleCollapse: {
+            "enabled": "false" // Enable collapsing the hieght of the header
+        }
     }
 },
 ```
