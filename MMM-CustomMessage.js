@@ -15,7 +15,7 @@ Module.register("MMM-CustomMessage", {
     // Define default module configuration
     defaults: {
         initialHeaderText: {
-            "value":"" // Initial header text value
+        	"value":"" // Initial header text value
         },
         initialText: {
 			"value": "" // Initial text value
