@@ -1,0 +1,30 @@
+{
+    "instance1": {
+        "uniqueID": "instance1",
+        "enableHistory": true,
+        "initialHeaderMessage": "",
+        "initialBodyMessage": "Instance1 Test",
+        "enableMessageExpiration": {
+            "enabled": false,
+            "clearAt": "00:00"
+        },
+        "message": {
+            "newMessageBody": "/clear",
+            "newMessageHeader": "Test Message Header1"
+        }
+    },
+    "instance2": {
+        "uniqueID": "instance2",
+        "enableHistory": true,
+        "initialHeaderMessage": "",
+        "initialBodyMessage": "Instance2 Test",
+        "enableMessageExpiration": {
+            "enabled": false,
+            "clearAt": "00:00"
+        },
+        "message": {
+            "newMessageBody": "/clear",
+            "newMessageHeader": "Test Message Header2"
+        }
+    }
+}
